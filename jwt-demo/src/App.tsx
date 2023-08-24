@@ -5,10 +5,16 @@ function App() {
 	const [username, setUsername] = useState<string>('')
 	const [password, setPassword] = useState<string>('')
 	const [message, setMessage] = useState<string>('')
+	const [token, setToken] = useState<string>('') // JWT
 	
-interface ApiResponse {
+interface ApiSignupResponse {
 	success: boolean;
 	message?: string;
+}
+interface ApiLoginResponse {
+	success: boolean;
+	message?: string;
+	token?: string;
 }
 
 	const handleCreateUser = async () => {
@@ -25,7 +31,7 @@ interface ApiResponse {
 			})
 		}
 		const response = await fetch(url, settings)
-		const data: ApiResponse = await response.json()
+		const data: ApiSignupResponse = await response.json()
 		console.log('handleCreateUser: ', data);
 		
 		if( data.success ) {
@@ -34,6 +40,27 @@ interface ApiResponse {
 			setMessage('Kunde inte skapa användare.')
 		}
 	}
+
+	const handleLogin = async () => {
+		const url = 'https://jv4lxh2izk.execute-api.eu-north-1.amazonaws.com/auth/login'
+		const settings = {
+			method: 'POST',
+			body: JSON.stringify({
+				username: username,
+				password: password
+			})
+		}
+		const response = await fetch(url, settings)
+		const data: ApiLoginResponse = await response.json()
+		console.log('handleLogin: ', data);
+		if( data.success ) {
+			setMessage('Du är inloggad!')
+			if( data.token ) setToken(data.token)
+		} else {
+			setMessage('Kunde inte logga in.')
+		}
+	}
+
 	return (
 		<div className="app">
 			<header>
@@ -46,13 +73,14 @@ interface ApiResponse {
 					<input type="text" placeholder="Lösenord" value={password} onChange={event => setPassword(event.target.value)} />
 					<div className="row">
 						<button onClick={handleCreateUser}> Skapa användare </button>
-						<button> Logga in </button>
+						<button onClick={handleLogin}> Logga in </button>
 					</div>
 					<p> {message} </p>
 				</section>
 
 				<section className="framed">
 					<h2> När inloggad </h2>
+					<p> {token ? token : 'Ingen token.'} </p>
 					<button> Hämta användarinfo </button>
 
 				</section>
