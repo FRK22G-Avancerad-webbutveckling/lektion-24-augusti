@@ -1,12 +1,6 @@
 import { useState } from 'react'
 import './App.css'
 
-function App() {
-	const [username, setUsername] = useState<string>('')
-	const [password, setPassword] = useState<string>('')
-	const [message, setMessage] = useState<string>('')
-	const [token, setToken] = useState<string>('') // JWT
-	
 interface ApiSignupResponse {
 	success: boolean;
 	message?: string;
@@ -16,6 +10,24 @@ interface ApiLoginResponse {
 	message?: string;
 	token?: string;
 }
+interface ApiAccountResponse {
+	success: boolean;
+	message?: string;
+	account?: Account;
+}
+interface Account {
+	password: string;
+	userId: string;
+	username: string;
+}
+
+function App() {
+	const [username, setUsername] = useState<string>('')
+	const [password, setPassword] = useState<string>('')
+	const [message, setMessage] = useState<string>('')
+	const [token, setToken] = useState<string>('') // JWT
+	const [message2, setMessage2] = useState<string>('')
+	
 
 	const handleCreateUser = async () => {
 		// 1. samla ihop användarnamn och lösenord
@@ -61,6 +73,29 @@ interface ApiLoginResponse {
 		}
 	}
 
+	const handleGetUserInfo = async () => {
+		// 1. förbereda request
+		// 2. skicka request och vänta på svar
+		// 3. oavsett success eller failure: visa status för användaren
+		const url = 'https://jv4lxh2izk.execute-api.eu-north-1.amazonaws.com/account'
+		const settings = {
+			method: 'GET',  // GET är default
+			headers: {
+				Authorization: `Bearer ${token}`
+			}
+		}
+		const response = await fetch(url, settings)
+		const data: ApiAccountResponse = await response.json()
+		console.log('handleGetUserInfo: ', data);
+
+		if( data.success && data.account ) {
+			const account: Account = data.account
+			setMessage2(`user id: ${account.userId}`)
+		} else {
+			setMessage2('Kunde inte hämta användarinfo.')
+		}
+	}
+
 	return (
 		<div className="app">
 			<header>
@@ -81,8 +116,8 @@ interface ApiLoginResponse {
 				<section className="framed">
 					<h2> När inloggad </h2>
 					<p> {token ? token : 'Ingen token.'} </p>
-					<button> Hämta användarinfo </button>
-
+					<button onClick={handleGetUserInfo}> Hämta användarinfo </button>
+					<p> {message2} </p>
 				</section>
 			</main>
 		</div>
