@@ -1,0 +1,26 @@
+.framed {
+	border: 1px solid black;
+	margin: 1em 0;
+	padding: 1em;
+	border-radius: 0.5em;
+	background-color: rgb(246, 179, 172);
+}
+
+.column {
+	display: flex;
+	flex-direction: column;
+}
+
+.row {
+	display: flex;
+	flex-direction: row;
+}
+
+input {
+	padding: 0.4em;
+	margin: 0.4em 0;
+}
+button {
+	padding: 0.4em;
+	margin: 0.4em 0.4em 0.4em 0;
+}
